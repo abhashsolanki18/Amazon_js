@@ -1,17 +1,16 @@
-import {cart } from "../data/cart.js";
+import {cart, removeFromCart } from "../data/cart.js";
 import { products } from "../data/products.js";
 import {formatcurrency} from "../utils/money.js";
 
   let cartHtml = '';
 
-  console.log(cart);
     cart.forEach((cartItem) => {
       let matchingItem;
       products.forEach((product) => {
           if (cartItem.productId === product.id) {
               matchingItem = product;
               cartHtml += `
-              <div class="cart-item-container">
+              <div class="cart-item-container container-${matchingItem.id}">
               <div class="delivery-date">
                 Delivery date: Tuesday, June 21
               </div>
@@ -34,7 +33,7 @@ import {formatcurrency} from "../utils/money.js";
                     <span class="update-quantity-link link-primary">
                       Update
                     </span>
-                    <span class="delete-quantity-link link-primary">
+                    <span class="delete-quantity-link link-primary del-link" data-product-id="${matchingItem.id}">
                       Delete
                     </span>
                   </div>
@@ -47,7 +46,7 @@ import {formatcurrency} from "../utils/money.js";
                   <div class="delivery-option">
                     <input type="radio" checked
                       class="delivery-option-input"
-                      name="delivery-option-${matchingItem.productId}">
+                      name="delivery-option-${matchingItem.id}">
                     <div>
                       <div class="delivery-option-date">
                         Tuesday, June 21
@@ -60,7 +59,7 @@ import {formatcurrency} from "../utils/money.js";
                   <div class="delivery-option">
                     <input type="radio"
                       class="delivery-option-input"
-                      name="delivery-option-${matchingItem.productId}">
+                      name="delivery-option-${matchingItem.id}">
                     <div>
                       <div class="delivery-option-date">
                         Wednesday, June 15
@@ -73,7 +72,7 @@ import {formatcurrency} from "../utils/money.js";
                   <div class="delivery-option">
                     <input type="radio"
                       class="delivery-option-input"
-                      name="delivery-option-${matchingItem.productId}">
+                      name="delivery-option-${matchingItem.id}">
                     <div>
                       <div class="delivery-option-date">
                         Monday, June 13
@@ -91,9 +90,14 @@ import {formatcurrency} from "../utils/money.js";
   });
 
   let orderSummaryElement = document.querySelector('.js-order-summary');
-  if (orderSummaryElement) {
       orderSummaryElement.innerHTML += cartHtml;
-      console.log(cartHtml);
-  } else {
-      console.error('Element with class .js-order-summary not found');
-  }
+
+      document.querySelectorAll('.del-link').forEach((link) => {
+        link.addEventListener('click', () => {
+          const productId = link.dataset.productId;
+          removeFromCart(productId);
+          
+         let delEle = document.querySelector(`.container-${productId}`);
+         delEle.remove();
+        });
+      });
